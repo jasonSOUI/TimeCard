@@ -140,7 +140,7 @@ public class App {
 
         // 下班打卡
         if (status.isOff()) {
-            if (StringUtils.isNotBlank(onButton.get().getAttribute("disabled")) && "true".equals(onButton.get().getAttribute("disabled"))) {
+            if (StringUtils.isNotBlank(offButton.get().getAttribute("disabled")) && "true".equals(onButton.get().getAttribute("disabled"))) {
                 System.out.println("已執行過下班打卡!!!");
             } else {
                 isCheckIn = true;
