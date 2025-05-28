@@ -118,7 +118,7 @@ public class App {
      * @param driver
      * @param status
      */
-    private static void checkin(WebDriver driver, TimeCardStatus status) {
+    private static void checkin(WebDriver driver, TimeCardStatus status) throws InterruptedException {
 
         boolean isCheckIn = false;
 
@@ -154,6 +154,8 @@ public class App {
             WebElement confirmButton = driver.findElement(By.className("el-message-box__btns")).findElement(By.className("el-button--primary"));
             confirmButton.click();
         }
+
+        Thread.sleep(1000);
     }
 
     /**
