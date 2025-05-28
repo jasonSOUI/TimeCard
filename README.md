@@ -31,4 +31,4 @@ user.password=
 
 
 ## 畫面
-![image]([picture or gif url](https://github.com/jasonSOUI/TimeCard/blob/master/log.png))
+![image](https://github.com/jasonSOUI/TimeCard/blob/master/log.png)
