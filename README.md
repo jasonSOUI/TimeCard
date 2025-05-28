@@ -11,7 +11,7 @@
 - JDK17、Maven3
 - 可使用環境變數(env)或([設定檔](src%2Fmain%2Fresources%2Fconfig.properties))
 - [webDriver請自行搭配適合的版本的Chrome](https://googlechromelabs.github.io/chrome-for-testing/)
-- [OeinAPI申請](https://platform.openai.com/docs/overview)
+- [OpenAPI申請](https://platform.openai.com/docs/overview)
 
 ```bash
 # Web Url
