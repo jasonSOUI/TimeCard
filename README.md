@@ -1,6 +1,6 @@
 ## 功能
 
-提供自動登入上下班打卡
+提供自動登入上下班打卡，可搭配windows排程來實現自動打卡
 
 ```bash
 上班打卡 : java -jar TimeCard-1.0-SNAPSHOT.jar -s on
@@ -10,7 +10,7 @@
 ## 環境設定
 - JDK17、Maven3
 - 可使用環境變數(env)或([設定檔](src%2Fmain%2Fresources%2Fconfig.properties))
-- [webDriver請自行搭配適合的版本的Chrome](https://googlechromelabs.github.io/chrome-for-testing/)
+- [webDriver請自行搭配適合的版本Chrome](https://googlechromelabs.github.io/chrome-for-testing/)
 - [OpenAPI申請](https://platform.openai.com/docs/overview)
 
 ```bash
