@@ -1,10 +1,12 @@
 ## 功能
 
-提供自動登入上下班打卡
-
+- 上班打卡
 ```bash
-上班打卡 : java -jar TimeCard-1.0-SNAPSHOT.jar -s on
-下班打卡 : java -jar TimeCard-1.0-SNAPSHOT.jar -s off
+java -jar TimeCard-1.0-SNAPSHOT.jar -s on
+```
+- 下班打卡
+```bash
+java -jar TimeCard-1.0-SNAPSHOT.jar -s off
 ```
 
 ## 環境設定
@@ -29,10 +31,6 @@ user.name=
 user.password=
 ```
 
-
-## 畫面
-
-> 可提供 1~3 張圖片，讓觀看者透過 README 了解整體畫面
 
 ![範例圖片 1](https://fakeimg.pl/500/)
 ![範例圖片 2](https://fakeimg.pl/500/)
