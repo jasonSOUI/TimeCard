@@ -1,6 +1,12 @@
 package com.mg;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -20,11 +26,15 @@ import java.util.Optional;
 public class App {
 
     public static void main(String[] args) {
+
+        WebDriver driver = null;
+
         try {
 
+            // 取得打卡狀態
+            Pair<TimeCardStatus, Boolean> params = getCheckinStatus(args);
             String webDriverPath =  ConfigReader.get("webdriver.path");
             String chromePath =  ConfigReader.get("chrome.path");
-            TimeCardStatus status = TimeCardStatus.ON;
 
             // 指定 ChromeDriver 路徑（若 chromedriver.exe 不在環境變數）
             System.setProperty("webdriver.chrome.driver", webDriverPath);
@@ -32,9 +42,18 @@ public class App {
             // 可選：手動指定 Chrome 安裝路徑（若未裝在預設位置）
             ChromeOptions options = new ChromeOptions();
             options.setBinary(chromePath);
+            options.addArguments("--disable-gpu");
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
+            options.addArguments("--window-size=1920,1080");
+            options.addArguments("--remote-debugging-port=9222");
+
+            if(!params.getRight()) {
+                options.addArguments("--headless");
+            }
 
             // 建立 Driver 實例
-            WebDriver driver = new ChromeDriver(options);
+            driver = new ChromeDriver(options);
 
             // 設定全域等待時間
             driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
@@ -44,18 +63,21 @@ public class App {
             System.out.println("login success!!");
 
             // 打卡
-            checkin(driver, status);
+            checkin(driver, params.getLeft());
             System.out.println("checkin success!!");
 
             // 取得打卡紀錄
             String record = getTimeCardLog(driver);
             System.out.println("Get TimeCard Log:" + record);
 
-            // 關閉瀏覽器
-            // driver.quit();
+            Thread.sleep(3000);
 
         } catch (Exception ex) {
             ex.printStackTrace();
+        } finally {
+            if(Objects.nonNull(driver)) {
+                driver.quit(); // 關閉瀏覽器
+            }
         }
     }
 
@@ -168,6 +190,42 @@ public class App {
 
         return "無法取得打卡紀錄，請重新檢查";
     }
+
+    /**
+     * 取得上班/下班打卡
+     * @param args
+     * @return
+     * @throws ParseException
+     */
+    private static Pair<TimeCardStatus, Boolean> getCheckinStatus(String[] args) throws ParseException {
+
+        boolean dubug = false;
+        Options options = new Options();
+        options.addOption("s", "status", true, "上/下班打卡");
+        options.addOption("d", "dubug", false, "除錯模式");
+
+        DefaultParser parser = new DefaultParser();
+        CommandLine cmdLine = parser.parse(options, args);
+
+        if(!cmdLine.hasOption("s")) {
+            System.out.println("尚未輸入參數，ex : -s on/off");
+            System.exit(2);
+        }
+
+        TimeCardStatus status = TimeCardStatus.findByCode(cmdLine.getOptionValue("s"));
+
+        if(Objects.isNull(status)) {
+            System.out.println("輸入參數錯誤，ex : -s on/off");
+            System.exit(2);
+        }
+
+        if(cmdLine.hasOption("d")) {
+            dubug = true;
+        }
+
+        return new ImmutablePair<>(status, dubug);
+    }
+
 
     private static String getDateTime() {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
