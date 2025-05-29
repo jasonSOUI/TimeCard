@@ -33,3 +33,6 @@ user.password=
 
 ## 畫面
 ![image](https://github.com/jasonSOUI/TimeCard/blob/master/log.png)
+
+## 流程
+![image](https://github.com/jasonSOUI/TimeCard/blob/master/uml.png)
