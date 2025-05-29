@@ -1,6 +1,6 @@
 ## 功能
 
-提供自動登入上下班打卡，可搭配windows排程來實現自動打卡
+提供自動登入上下班打卡，可搭配其他排程程式來實現自動打卡
 
 ```bash
 上班打卡 : java -jar TimeCard-1.0-SNAPSHOT.jar -s on
