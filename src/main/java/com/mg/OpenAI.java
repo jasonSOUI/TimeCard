@@ -41,7 +41,9 @@ public class OpenAI {
                 .flatMap(choice -> choice.message().content().stream())
                 .findFirst().get();
 
+        // 避免出現非答案文字
+        answer = answer.replaceAll("[^0-9-]", "");
+
         return answer;
     }
-
 }
