@@ -1,5 +1,6 @@
-package com.mg;
+package com.mg.ai;
 
+import com.mg.ConfigReader;
 import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import com.openai.models.ChatModel;
@@ -12,14 +13,8 @@ import java.util.List;
 
 public class OpenAI {
 
-    /**
-     * 解析圖片取得驗證碼
-     * @param base64Image
-     * @return
-     */
-    public static String getImageValidateCode(String base64Image) {
+    public String getImageValidateCode(String apiKey, String base64Image) {
 
-        String apiKey = ConfigReader.get("api.key");
         OpenAIClient client = OpenAIOkHttpClient.builder().apiKey(apiKey).build();
 
         ChatCompletionContentPart logoContentPart =
@@ -41,7 +36,6 @@ public class OpenAI {
                 .flatMap(choice -> choice.message().content().stream())
                 .findFirst().get();
 
-        // 避免出現非答案文字
         answer = answer.replaceAll("[^0-9-]", "");
 
         return answer;

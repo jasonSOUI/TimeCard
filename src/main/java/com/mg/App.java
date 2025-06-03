@@ -1,5 +1,8 @@
 package com.mg;
 
+import com.mg.ai.AISelector;
+import com.mg.ai.GeminiAI;
+import com.mg.ai.OpenAI;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
@@ -104,7 +107,7 @@ public class App {
         WebElement loginCode = driver.findElement(By.className("login-code"));
         WebElement img = loginCode.findElement(By.tagName("img"));
         String captchaUrl = img.getAttribute("src");
-        String code = OpenAI.getImageValidateCode(captchaUrl);
+        String code = AISelector.getImageValidateCode(captchaUrl);
         System.out.println("驗證碼圖片答案:" + code);
         list.get(2).sendKeys(code);
 
