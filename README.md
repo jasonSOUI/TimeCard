@@ -11,7 +11,7 @@
 - JDK17、Maven3
 - 可使用環境變數(env)或([設定檔](src%2Fmain%2Fresources%2Fconfig.properties))
 - [webDriver請自行搭配適合的版本Chrome](https://googlechromelabs.github.io/chrome-for-testing/)
-- [OpenAPI申請](https://platform.openai.com/docs/overview)
+- [OpenAPI申請](https://platform.openai.com/docs/overview)、[Gemini API申請](https://ai.google.dev/gemini-api/docs/api-key?hl=zh-tw)，選擇一個申請即可
 
 ```bash
 # Web Url
@@ -24,6 +24,9 @@ chrome.path=C:/Program Files/Google/Chrome/Application/chrome.exe
 
 # OPEN API KEY(需自行申請)
 api.key=
+
+# Gemini API KEY(需自行申請)
+gemini.api.key=
 
 # 帳號/密碼(登入使用)
 user.name=
