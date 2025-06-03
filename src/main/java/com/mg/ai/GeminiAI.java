@@ -4,7 +4,6 @@ import com.google.genai.Client;
 import com.google.genai.types.Content;
 import com.google.genai.types.GenerateContentResponse;
 import com.google.genai.types.Part;
-import com.mg.ConfigReader;
 
 import java.util.Base64;
 import java.util.List;

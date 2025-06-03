@@ -1,8 +1,8 @@
 package com.mg;
 
 import com.mg.ai.AISelector;
-import com.mg.ai.GeminiAI;
-import com.mg.ai.OpenAI;
+import com.mg.config.ConfigReader;
+import com.mg.enums.TimeCardStatus;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;

@@ -1,6 +1,5 @@
 package com.mg.ai;
 
-import com.mg.ConfigReader;
 import com.openai.client.OpenAIClient;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import com.openai.models.ChatModel;

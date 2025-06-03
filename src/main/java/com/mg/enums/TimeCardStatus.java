@@ -1,4 +1,4 @@
-package com.mg;
+package com.mg.enums;
 
 public enum TimeCardStatus {
 

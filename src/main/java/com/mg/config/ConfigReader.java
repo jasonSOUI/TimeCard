@@ -1,4 +1,4 @@
-package com.mg;
+package com.mg.config;
 
 import org.apache.commons.lang3.StringUtils;
 
