@@ -1,6 +1,6 @@
 package com.mg.ai;
 
-import com.mg.ConfigReader;
+import com.mg.config.ConfigReader;
 import org.apache.commons.lang3.StringUtils;
 
 public class AISelector {
