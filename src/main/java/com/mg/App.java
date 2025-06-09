@@ -7,15 +7,20 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Calendar;
@@ -121,7 +126,7 @@ public class App {
      * @param driver
      * @param status
      */
-    private static void checkin(WebDriver driver, TimeCardStatus status) throws InterruptedException {
+    private static void checkin(WebDriver driver, TimeCardStatus status) throws InterruptedException, IOException {
 
         boolean isCheckIn = false;
 
@@ -157,6 +162,11 @@ public class App {
             WebElement confirmButton = driver.findElement(By.className("el-message-box__btns")).findElement(By.className("el-button--primary"));
             confirmButton.click();
         }
+
+        Thread.sleep(1000);
+
+        // 截圖
+        screenshot(driver);
 
         Thread.sleep(1000);
     }
@@ -229,6 +239,28 @@ public class App {
         }
 
         return new ImmutablePair<>(status, dubug);
+    }
+
+    private static void screenshot(WebDriver driver) {
+        try {
+            String path = ConfigReader.get("screenshot.path");
+            if (StringUtils.isNotBlank(path)) {
+
+                File filePath = new File(path);
+                if (!filePath.exists()) filePath.mkdirs();
+
+                TakesScreenshot screenshot = (TakesScreenshot) driver;
+                File sourceFile = screenshot.getScreenshotAs(OutputType.FILE);
+                File destFile = new File(path + File.separator + String.format("%s.png", getSimpleDateTime()));
+                FileUtils.copyFile(sourceFile, destFile);
+            }
+        } catch(Exception ex) {
+            System.out.println("screenshot fail : " + ex.getMessage());
+        }
+    }
+
+    private static String getSimpleDateTime() {
+        return new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
     }
 
 
