@@ -13,12 +13,16 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -243,17 +247,47 @@ public class App {
 
     private static void screenshot(WebDriver driver) {
         try {
+
             String path = ConfigReader.get("screenshot.path");
             if (StringUtils.isNotBlank(path)) {
-
                 File filePath = new File(path);
                 if (!filePath.exists()) filePath.mkdirs();
+            } else {
+                return;
+            }
+
+            WebElement divElement = driver.findElement(By.className("checkin-main"));
+
+            if(divElement != null) {
+                Point point = divElement.getLocation();
+                int x = point.getX();
+                int y = point.getY();
+                Rectangle rect = new Rectangle(x, y, 480, 420);
+
+                File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+                BufferedImage fullScreenImage = ImageIO.read(screenshot);
+
+                // 裁剪圖片
+                BufferedImage croppedImage = fullScreenImage.getSubimage(
+                        rect.x,
+                        rect.y,
+                        rect.width,
+                        rect.height
+                );
+
+                // 將裁剪後的圖片保存到指定路徑
+                File output = new File(path + File.separator + String.format("%s.png", getSimpleDateTime()));
+                ImageIO.write(croppedImage, "png", output);
+                System.out.println("成功截圖指定 DIV 並保存到: " + output.getAbsolutePath());
+
+            } else {
 
                 TakesScreenshot screenshot = (TakesScreenshot) driver;
                 File sourceFile = screenshot.getScreenshotAs(OutputType.FILE);
                 File destFile = new File(path + File.separator + String.format("%s.png", getSimpleDateTime()));
                 FileUtils.copyFile(sourceFile, destFile);
             }
+
         } catch(Exception ex) {
             System.out.println("screenshot fail : " + ex.getMessage());
         }
