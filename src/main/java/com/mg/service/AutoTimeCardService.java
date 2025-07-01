@@ -15,6 +15,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -77,8 +79,6 @@ public class AutoTimeCardService {
             checkin(driver, status);
             System.out.println("checkin success!!");
 
-            Thread.sleep(1000);
-
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         } finally {
@@ -117,7 +117,8 @@ public class AutoTimeCardService {
 
         // 登入按鈕
         driver.findElement(By.tagName("button")).click();
-        Thread.sleep(3000);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.className("checkin-btn-row")));
     }
 
     /**
@@ -125,7 +126,7 @@ public class AutoTimeCardService {
      * @param driver
      * @param status
      */
-    private static void checkin(WebDriver driver, TimeCardStatus status) throws InterruptedException, IOException {
+    private static void checkin(WebDriver driver, TimeCardStatus status) throws IOException {
 
         boolean isCheckIn = false;
 
@@ -158,16 +159,15 @@ public class AutoTimeCardService {
 
         // 確認視窗
         if(isCheckIn) {
-            WebElement confirmButton = driver.findElement(By.className("el-message-box__btns")).findElement(By.className("el-button--primary"));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebElement confirmButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".el-message-box__btns .el-button--primary")));
             confirmButton.click();
+            // 等待確認視窗消失
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(By.className("el-message-box__wrapper")));
         }
-
-        Thread.sleep(1000);
 
         // 截圖
         screenshot(driver);
-
-        Thread.sleep(1000);
     }
 
     /**
