@@ -57,7 +57,7 @@ public class AutoTimeCardService {
             options.addArguments("--window-size=1920,1080");
             options.addArguments("--remote-debugging-port=9222");
 
-            if(debug) {
+            if(!debug) {
                 options.addArguments("--headless");
             }
 
