@@ -3,6 +3,7 @@ package com.mg.service;
 import com.mg.ai.AISelector;
 import com.mg.config.ConfigReader;
 import com.mg.enums.TimeCardStatus;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -45,23 +46,18 @@ public class AutoTimeCardService {
 
         try {
 
-            // 取得打卡狀態
-            String webDriverPath =  ConfigReader.get("webdriver.path");
-            String chromePath =  ConfigReader.get("chrome.path");
-
-            // 指定 ChromeDriver 路徑（若 chromedriver.exe 不在環境變數）
-            System.setProperty("webdriver.chrome.driver", webDriverPath);
+            // 自動下載 WebDriver
+            WebDriverManager.chromedriver().setup();
 
             // 可選：手動指定 Chrome 安裝路徑（若未裝在預設位置）
             ChromeOptions options = new ChromeOptions();
-            options.setBinary(chromePath);
             options.addArguments("--disable-gpu");
             options.addArguments("--no-sandbox");
             options.addArguments("--disable-dev-shm-usage");
             options.addArguments("--window-size=1920,1080");
             options.addArguments("--remote-debugging-port=9222");
 
-            if(debug) {
+            if(!debug) {
                 options.addArguments("--headless");
             }
 
