@@ -1,0 +1,14 @@
+# 用者名稱
+user.name=
+
+# 密碼
+user.password=
+
+# OPEN AI KEY
+api.key=
+
+# Gemini API KEY
+gemini.api.key=
+
+# 截圖儲存路徑
+# screenshot.path=D:/screenshot
