@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.PrintStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 
 
 public class TimeCardUI extends JFrame {
@@ -31,6 +32,7 @@ public class TimeCardUI extends JFrame {
         logArea = new JTextArea();
         logArea.setEditable(false);
         logArea.setMargin(new Insets(5,5,5,5));
+        logArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
         JScrollPane scrollPane = new JScrollPane(logArea);
 
         // --- Layout ---
@@ -44,9 +46,13 @@ public class TimeCardUI extends JFrame {
         add(scrollPane, BorderLayout.CENTER);
 
         // --- Redirect System.out to JTextArea ---
-        PrintStream printStream = new PrintStream(new CustomOutputStream(logArea));
-        System.setOut(printStream);
-        System.setErr(printStream);
+        try {
+            PrintStream printStream = new PrintStream(new CustomOutputStream(logArea), true, "UTF-8");
+            System.setOut(printStream);
+            System.setErr(printStream);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
         // --- Event Listeners ---
         clockInButton.addActionListener(new ActionListener() {
