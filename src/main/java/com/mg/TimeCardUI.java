@@ -1,24 +1,40 @@
 package com.mg;
 
+import com.mg.config.ConfigManager;
 import com.mg.enums.TimeCardStatus;
 import com.mg.service.AutoTimeCardService;
+import com.mg.service.TimeCardScheduler;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.PrintStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Calendar;
+import java.util.Date;
 
 
 public class TimeCardUI extends JFrame {
+
+    private final TimeCardScheduler scheduler = new TimeCardScheduler();
 
     private JButton clockInButton;
     private JButton clockOutButton;
     private JButton clearButton;
     private JTextArea logArea;
     private JCheckBox debugCheckBox;
+
+    // Schedule components
+    private JCheckBox scheduleOnEnabled;
+    private JSpinner onTimeSpinner;
+    private JCheckBox scheduleOffEnabled;
+    private JSpinner offTimeSpinner;
+    private JButton saveScheduleButton;
+
 
     public TimeCardUI() {
         setTitle("自動打卡程式");
@@ -44,9 +60,38 @@ public class TimeCardUI extends JFrame {
         topPanel.add(clearButton);
         topPanel.add(debugCheckBox);
 
+        // --- Schedule Panel ---
+        JPanel schedulePanel = new JPanel();
+        schedulePanel.setBorder(BorderFactory.createTitledBorder("定時打卡設定"));
+        schedulePanel.setLayout(new GridLayout(3, 3, 5, 5));
+
+        scheduleOnEnabled = new JCheckBox("啟用定時上班打卡");
+        onTimeSpinner = new JSpinner(new SpinnerDateModel());
+        JSpinner.DateEditor onTimeEditor = new JSpinner.DateEditor(onTimeSpinner, "HH:mm");
+        onTimeSpinner.setEditor(onTimeEditor);
+
+        scheduleOffEnabled = new JCheckBox("啟用定時下班打卡");
+        offTimeSpinner = new JSpinner(new SpinnerDateModel());
+        JSpinner.DateEditor offTimeEditor = new JSpinner.DateEditor(offTimeSpinner, "HH:mm");
+        offTimeSpinner.setEditor(offTimeEditor);
+
+        saveScheduleButton = new JButton("儲存定時設定");
+
+        schedulePanel.add(scheduleOnEnabled);
+        schedulePanel.add(new JLabel("上班時間:"));
+        schedulePanel.add(onTimeSpinner);
+        schedulePanel.add(scheduleOffEnabled);
+        schedulePanel.add(new JLabel("下班時間:"));
+        schedulePanel.add(offTimeSpinner);
+        schedulePanel.add(new JLabel()); // placeholder
+        schedulePanel.add(saveScheduleButton);
+        schedulePanel.add(new JLabel()); // placeholder
+
+
         setLayout(new BorderLayout());
         add(topPanel, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
+        add(schedulePanel, BorderLayout.SOUTH);
 
         // --- Redirect System.out to JTextArea ---
         try {
@@ -78,6 +123,85 @@ public class TimeCardUI extends JFrame {
                 logArea.setText("");
             }
         });
+
+        saveScheduleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveSchedule();
+            }
+        });
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                scheduler.shutdown();
+                super.windowClosing(e);
+            }
+        });
+
+        // Load initial schedule
+        loadSchedule();
+        updateSchedules();
+    }
+
+    private void loadSchedule() {
+        // Load ON_DUTY schedule
+        scheduleOnEnabled.setSelected(ConfigManager.isScheduleEnabled(TimeCardStatus.ON));
+        Calendar onCal = Calendar.getInstance();
+        onCal.set(Calendar.HOUR_OF_DAY, ConfigManager.getScheduleHour(TimeCardStatus.ON));
+        onCal.set(Calendar.MINUTE, ConfigManager.getScheduleMinute(TimeCardStatus.ON));
+        onTimeSpinner.setValue(onCal.getTime());
+
+        // Load OFF_DUTY schedule
+        scheduleOffEnabled.setSelected(ConfigManager.isScheduleEnabled(TimeCardStatus.OFF));
+        Calendar offCal = Calendar.getInstance();
+        offCal.set(Calendar.HOUR_OF_DAY, ConfigManager.getScheduleHour(TimeCardStatus.OFF));
+        offCal.set(Calendar.MINUTE, ConfigManager.getScheduleMinute(TimeCardStatus.OFF));
+        offTimeSpinner.setValue(offCal.getTime());
+    }
+
+    private void saveSchedule() {
+        // Save ON_DUTY schedule
+        ConfigManager.setProperty("schedule.on.enabled", String.valueOf(scheduleOnEnabled.isSelected()));
+        Date onDate = (Date) onTimeSpinner.getValue();
+        Calendar onCal = Calendar.getInstance();
+        onCal.setTime(onDate);
+        ConfigManager.setProperty("schedule.on.hour", String.valueOf(onCal.get(Calendar.HOUR_OF_DAY)));
+        ConfigManager.setProperty("schedule.on.minute", String.valueOf(onCal.get(Calendar.MINUTE)));
+
+        // Save OFF_DUTY schedule
+        ConfigManager.setProperty("schedule.off.enabled", String.valueOf(scheduleOffEnabled.isSelected()));
+        Date offDate = (Date) offTimeSpinner.getValue();
+        Calendar offCal = Calendar.getInstance();
+        offCal.setTime(offDate);
+        ConfigManager.setProperty("schedule.off.hour", String.valueOf(offCal.get(Calendar.HOUR_OF_DAY)));
+        ConfigManager.setProperty("schedule.off.minute", String.valueOf(offCal.get(Calendar.MINUTE)));
+
+        ConfigManager.save();
+        System.out.println("定時設定已儲存！");
+
+        // Reschedule tasks
+        updateSchedules();
+    }
+
+    private void updateSchedules() {
+        if (scheduleOnEnabled.isSelected()) {
+            Date onDate = (Date) onTimeSpinner.getValue();
+            Calendar onCal = Calendar.getInstance();
+            onCal.setTime(onDate);
+            scheduler.schedule(TimeCardStatus.ON, onCal.get(Calendar.HOUR_OF_DAY), onCal.get(Calendar.MINUTE));
+        } else {
+            scheduler.cancel(TimeCardStatus.ON);
+        }
+
+        if (scheduleOffEnabled.isSelected()) {
+            Date offDate = (Date) offTimeSpinner.getValue();
+            Calendar offCal = Calendar.getInstance();
+            offCal.setTime(offDate);
+            scheduler.schedule(TimeCardStatus.OFF, offCal.get(Calendar.HOUR_OF_DAY), offCal.get(Calendar.MINUTE));
+        } else {
+            scheduler.cancel(TimeCardStatus.OFF);
+        }
     }
 
     private void runTimeCard(TimeCardStatus status) {
