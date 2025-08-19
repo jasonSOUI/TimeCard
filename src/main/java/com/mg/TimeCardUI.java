@@ -16,11 +16,11 @@ public class TimeCardUI extends JFrame {
 
     private JButton clockInButton;
     private JButton clockOutButton;
+    private JButton clearButton;
     private JTextArea logArea;
     private JCheckBox debugCheckBox;
 
     public TimeCardUI() {
-
         setTitle("自動打卡程式");
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -29,6 +29,7 @@ public class TimeCardUI extends JFrame {
         // --- Components ---
         clockInButton = new JButton("上班打卡 (on)");
         clockOutButton = new JButton("下班打卡 (off)");
+        clearButton = new JButton("清除");
         debugCheckBox = new JCheckBox("除錯模式 (debug)");
         logArea = new JTextArea();
         logArea.setEditable(false);
@@ -40,6 +41,7 @@ public class TimeCardUI extends JFrame {
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topPanel.add(clockInButton);
         topPanel.add(clockOutButton);
+        topPanel.add(clearButton);
         topPanel.add(debugCheckBox);
 
         setLayout(new BorderLayout());
@@ -48,11 +50,10 @@ public class TimeCardUI extends JFrame {
 
         // --- Redirect System.out to JTextArea ---
         try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             PrintStream printStream = new PrintStream(new CustomOutputStream(logArea), true, "UTF-8");
             System.setOut(printStream);
             System.setErr(printStream);
-        } catch (Exception e) {
+        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
@@ -68,6 +69,13 @@ public class TimeCardUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 runTimeCard(TimeCardStatus.OFF);
+            }
+        });
+
+        clearButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                logArea.setText("");
             }
         });
     }
