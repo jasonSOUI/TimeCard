@@ -20,6 +20,7 @@ public class TimeCardUI extends JFrame {
     private JCheckBox debugCheckBox;
 
     public TimeCardUI() {
+
         setTitle("自動打卡程式");
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -47,10 +48,11 @@ public class TimeCardUI extends JFrame {
 
         // --- Redirect System.out to JTextArea ---
         try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             PrintStream printStream = new PrintStream(new CustomOutputStream(logArea), true, "UTF-8");
             System.setOut(printStream);
             System.setErr(printStream);
-        } catch (UnsupportedEncodingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
