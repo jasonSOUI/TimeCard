@@ -9,6 +9,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.swing.*;
 import java.util.Objects;
 
 /**
@@ -17,14 +18,22 @@ import java.util.Objects;
 public class App {
 
     public static void main(String[] args) {
-        try {
-
-            Pair<TimeCardStatus, Boolean> params = getCheckinStatus(args);
-            new AutoTimeCardService().checkin(params.getLeft(), params.getRight());
-
-        } catch(Exception ex) {
-            System.out.println("自動打卡失敗:" + ex.getMessage());
-            System.exit(2);
+        // if no arguments are provided, launch the GUI.
+        if (args.length == 0) {
+            SwingUtilities.invokeLater(() -> {
+                TimeCardUI ui = new TimeCardUI();
+                ui.setVisible(true);
+            });
+        } else {
+            // otherwise, run the command-line version
+            try {
+                Pair<TimeCardStatus, Boolean> params = getCheckinStatus(args);
+                new AutoTimeCardService().checkin(params.getLeft(), params.getRight());
+                System.exit(0);
+            } catch (Exception ex) {
+                System.out.println("自動打卡失敗:" + ex.getMessage());
+                System.exit(2);
+            }
         }
     }
 
