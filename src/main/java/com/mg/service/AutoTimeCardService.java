@@ -72,7 +72,7 @@ public class AutoTimeCardService {
             System.out.println("login success!!");
 
             // 打卡
-            checkin(driver, status);
+//            checkin(driver, status);
             System.out.println("checkin success!!");
 
         } catch (Exception ex) {

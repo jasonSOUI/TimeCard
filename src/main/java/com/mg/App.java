@@ -20,6 +20,13 @@ public class App {
     public static void main(String[] args) {
         // if no arguments are provided, launch the GUI.
         if (args.length == 0) {
+
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
             SwingUtilities.invokeLater(() -> {
                 TimeCardUI ui = new TimeCardUI();
                 ui.setVisible(true);

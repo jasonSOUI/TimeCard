@@ -50,7 +50,7 @@ public class TimeCardUI extends JFrame {
         logArea = new JTextArea();
         logArea.setEditable(false);
         logArea.setMargin(new Insets(5,5,5,5));
-        logArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        logArea.setFont(new Font("新細明體", Font.PLAIN, 12));
         JScrollPane scrollPane = new JScrollPane(logArea);
 
         // --- Layout ---
@@ -242,11 +242,30 @@ public class TimeCardUI extends JFrame {
         }
 
         @Override
-        public void write(int b) {
-            // redirects data to the text area
-            textArea.append(String.valueOf((char)b));
-            // scrolls the text area to the end of data
-            textArea.setCaretPosition(textArea.getDocument().getLength());
+        public void write(int b) throws java.io.IOException {
+            // This method is less efficient, but we make it work by delegating
+            // to the array-based write method.
+            write(new byte[]{(byte) b}, 0, 1);
+        }
+
+        @Override
+        public void write(byte[] b, int off, int len) throws java.io.IOException {
+            // The bytes from PrintStream are UTF-8 encoded because we specified it.
+            // We must decode them using the same encoding.
+            final String text;
+            try {
+                text = new String(b, off, len, "UTF-8");
+            } catch (java.io.UnsupportedEncodingException e) {
+                // This should never happen with UTF-8
+                throw new java.io.IOException("UTF-8 encoding not supported", e);
+            }
+
+            // Updates to the GUI should be done on the Event Dispatch Thread.
+            SwingUtilities.invokeLater(() -> {
+                textArea.append(text);
+                // scrolls the text area to the end of data
+                textArea.setCaretPosition(textArea.getDocument().getLength());
+            });
         }
     }
 }
